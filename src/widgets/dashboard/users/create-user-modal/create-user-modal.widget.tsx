@@ -35,6 +35,13 @@ import { gbToBytesUtil } from '@shared/utils/bytes'
 const MotionWrapper = motion.div
 const MotionStack = motion.create(Stack)
 
+type CreateUserFormValues = CreateUserCommand.Request & {
+    trafficResetDay?: number
+}
+
+const emptyStringToUndefined = (value: unknown) => (value === '' ? undefined : value)
+const emptyStringToNull = (value: unknown) => (value === '' ? null : value)
+
 const containerVariants = {
     hidden: {},
     visible: {
@@ -76,7 +83,7 @@ export const CreateUserModalWidget = () => {
         }
     })
 
-    const form = useForm<CreateUserCommand.Request>({
+    const form = useForm<CreateUserFormValues>({
         name: 'create-user-form',
         mode: 'uncontrolled',
         validateInputOnBlur: true,
@@ -100,6 +107,7 @@ export const CreateUserModalWidget = () => {
             status: USERS_STATUS.ACTIVE,
             username: '',
             trafficLimitStrategy: 'NO_RESET',
+            trafficResetDay: 1,
             expireAt: dayjs().add(1, 'day').toDate(),
             trafficLimitBytes: 0,
             description: '',
@@ -119,25 +127,25 @@ export const CreateUserModalWidget = () => {
     }
 
     const handleSubmit = form.onSubmit(async (values) => {
+        const variables = {
+            username: values.username,
+            trafficLimitStrategy: values.trafficLimitStrategy,
+            trafficResetDay: values.trafficResetDay ?? 1,
+            trafficLimitBytes: gbToBytesUtil(values.trafficLimitBytes),
+            expireAt: dayjs(values.expireAt).toISOString(),
+            status: values.status,
+            description: values.description,
+            telegramId: emptyStringToUndefined(values.telegramId),
+            email: emptyStringToUndefined(values.email),
+            hwidDeviceLimit: emptyStringToNull(values.hwidDeviceLimit),
+            tag: values.tag,
+            activeInternalSquads: values.activeInternalSquads,
+            externalSquadUuid: values.externalSquadUuid
+        } as unknown as CreateUserCommand.Request & { trafficResetDay?: number }
+
         createUser(
             {
-                variables: {
-                    username: values.username,
-                    trafficLimitStrategy: values.trafficLimitStrategy,
-                    trafficLimitBytes: gbToBytesUtil(values.trafficLimitBytes),
-                    // @ts-expect-error - TODO: fix ZOD schema
-                    expireAt: dayjs(values.expireAt).toISOString(),
-                    status: values.status,
-                    description: values.description,
-                    // @ts-expect-error - TODO: fix ZOD schema
-                    telegramId: values.telegramId === '' ? undefined : values.telegramId,
-                    email: values.email === '' ? undefined : values.email,
-                    // @ts-expect-error - TODO: fix ZOD schema
-                    hwidDeviceLimit: values.hwidDeviceLimit === '' ? null : values.hwidDeviceLimit,
-                    tag: values.tag,
-                    activeInternalSquads: values.activeInternalSquads,
-                    externalSquadUuid: values.externalSquadUuid
-                }
+                variables: variables as CreateUserCommand.Request
             },
             {
                 onError: (error) => handleFormErrors(form, error)

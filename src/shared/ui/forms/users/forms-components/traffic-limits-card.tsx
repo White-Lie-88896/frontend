@@ -1,4 +1,4 @@
-import { CreateUserCommand, UpdateUserCommand } from '@remnawave/backend-contract'
+import { CreateUserCommand, RESET_PERIODS, UpdateUserCommand } from '@remnawave/backend-contract'
 import { ForwardRefComponent, HTMLMotionProps, Variants } from 'motion/react'
 import { NumberInput, Select, Stack, Text } from '@mantine/core'
 import { UseFormReturnType } from '@mantine/form'
@@ -10,13 +10,17 @@ import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
 import { resetDataStrategy } from '@shared/constants/forms'
 import { SectionCard } from '@shared/ui/section-card'
 
-interface IProps<T extends CreateUserCommand.Request | UpdateUserCommand.Request> {
+type UserTrafficFormValues = (CreateUserCommand.Request | UpdateUserCommand.Request) & {
+    trafficResetDay?: number
+}
+
+interface IProps<T extends UserTrafficFormValues> {
     cardVariants: Variants
     form: UseFormReturnType<T>
     motionWrapper: ForwardRefComponent<HTMLDivElement, HTMLMotionProps<'div'>>
 }
 
-export const TrafficLimitsCard = <T extends CreateUserCommand.Request | UpdateUserCommand.Request>(
+export const TrafficLimitsCard = <T extends UserTrafficFormValues>(
     props: IProps<T>
 ) => {
     const { t } = useTranslation()
@@ -84,6 +88,24 @@ export const TrafficLimitsCard = <T extends CreateUserCommand.Request | UpdateUs
                                 label: { fontWeight: 500 }
                             }}
                         />
+
+                        {form.values.trafficLimitStrategy === RESET_PERIODS.MONTH && (
+                            <NumberInput
+                                allowDecimal={false}
+                                allowNegative={false}
+                                clampBehavior="strict"
+                                decimalScale={0}
+                                description={t('create-user-modal.widget.traffic-reset-day-description')}
+                                key={form.key('trafficResetDay')}
+                                label={t('create-user-modal.widget.traffic-reset-day')}
+                                max={31}
+                                min={1}
+                                {...form.getInputProps('trafficResetDay')}
+                                styles={{
+                                    label: { fontWeight: 500 }
+                                }}
+                            />
+                        )}
                     </Stack>
                 </SectionCard.Section>
             </SectionCard.Root>

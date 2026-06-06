@@ -297,6 +297,8 @@
             "pick-value": "انتخاب مقدار",
             "traffic-reset-strategy": "دوره بازنشانی ترافیک",
             "traffic-reset-strategy-description": "هر چند وقت یک بار ترافیک کاربر بازنشانی شود",
+            "traffic-reset-day": "روز بازنشانی ترافیک",
+            "traffic-reset-day-description": "روز ماه برای بازنشانی ماهانه ترافیک کاربر",
             "data-limit": "محدودیت ترافیک",
             "data-limit-description": "محدودیت ترافیک را به گیگابایت وارد کنید (0 به معنی نامحدود است)",
             "username-cannot-be-changed-later": "نام کاربری نمی تواند بعدا تغییر داده شود",

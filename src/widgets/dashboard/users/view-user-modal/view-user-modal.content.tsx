@@ -40,6 +40,12 @@ import { queryClient } from '@shared/api'
 const MotionWrapper = motion.div
 const MotionStack = motion.create(Stack)
 
+type UpdateUserFormValues = UpdateUserCommand.Request & {
+    trafficResetDay?: number
+}
+
+const emptyStringToNull = (value: unknown) => (value === '' ? null : value)
+
 const containerVariants = {
     hidden: {},
     visible: {
@@ -76,7 +82,7 @@ export const ViewUserModalContent = (props: IProps) => {
     const { data: nodes } = useGetNodes()
     const { data: tags } = useGetUserTags()
 
-    const form = useForm<UpdateUserCommand.Request>({
+    const form = useForm<UpdateUserFormValues>({
         name: 'edit-user-form',
         mode: 'uncontrolled',
         onValuesChange: (values) => {
@@ -126,6 +132,7 @@ export const ViewUserModalContent = (props: IProps) => {
 
     useEffect(() => {
         if (user && internalSquads) {
+            const userWithTrafficResetDay = user as typeof user & { trafficResetDay?: number }
             const activeInternalSquads = user.activeInternalSquads.map(
                 (internalSquad) => internalSquad.uuid
             )
@@ -134,6 +141,7 @@ export const ViewUserModalContent = (props: IProps) => {
                 uuid: user.uuid,
                 trafficLimitBytes: bytesToGbUtil(user.trafficLimitBytes),
                 trafficLimitStrategy: user.trafficLimitStrategy,
+                trafficResetDay: userWithTrafficResetDay.trafficResetDay ?? 1,
                 expireAt: user.expireAt,
                 activeInternalSquads,
                 description: user.description ?? '',
@@ -154,33 +162,32 @@ export const ViewUserModalContent = (props: IProps) => {
 
     const handleSubmit = form.onSubmit(async (values) => {
         const touchedFields = form.getTouched()
+        const variables = {
+            uuid: values.uuid,
+            trafficLimitStrategy: touchedFields.trafficLimitStrategy
+                ? values.trafficLimitStrategy
+                : undefined,
+            trafficResetDay: touchedFields.trafficResetDay ? values.trafficResetDay : undefined,
+            trafficLimitBytes: touchedFields.trafficLimitBytes
+                ? gbToBytesUtil(values.trafficLimitBytes)
+                : undefined,
+            expireAt: touchedFields.expireAt ? dayjs(values.expireAt).toISOString() : undefined,
+            activeInternalSquads: touchedFields.activeInternalSquads
+                ? values.activeInternalSquads
+                : undefined,
+            description: touchedFields.description ? values.description : undefined,
+            telegramId: emptyStringToNull(values.telegramId),
+            email: emptyStringToNull(values.email),
+            hwidDeviceLimit: emptyStringToNull(values.hwidDeviceLimit),
+            // eslint-disable-next-line no-nested-ternary
+            tag: touchedFields.tag ? (values.tag === '' ? null : values.tag) : undefined,
+            externalSquadUuid: touchedFields.externalSquadUuid
+                ? values.externalSquadUuid
+                : undefined
+        } as unknown as UpdateUserCommand.Request & { trafficResetDay?: number }
 
         updateUser({
-            variables: {
-                uuid: values.uuid,
-                trafficLimitStrategy: touchedFields.trafficLimitStrategy
-                    ? values.trafficLimitStrategy
-                    : undefined,
-                trafficLimitBytes: touchedFields.trafficLimitBytes
-                    ? gbToBytesUtil(values.trafficLimitBytes)
-                    : undefined,
-                // @ts-expect-error - TODO: fix ZOD schema
-                expireAt: touchedFields.expireAt ? dayjs(values.expireAt).toISOString() : undefined,
-                activeInternalSquads: touchedFields.activeInternalSquads
-                    ? values.activeInternalSquads
-                    : undefined,
-                description: touchedFields.description ? values.description : undefined,
-                // @ts-expect-error - TODO: fix ZOD schema
-                telegramId: values.telegramId === '' ? null : values.telegramId,
-                email: values.email === '' ? null : values.email,
-                // @ts-expect-error - TODO: fix ZOD schema
-                hwidDeviceLimit: values.hwidDeviceLimit === '' ? null : values.hwidDeviceLimit,
-                // eslint-disable-next-line no-nested-ternary
-                tag: touchedFields.tag ? (values.tag === '' ? null : values.tag) : undefined,
-                externalSquadUuid: touchedFields.externalSquadUuid
-                    ? values.externalSquadUuid
-                    : undefined
-            }
+            variables: variables as UpdateUserCommand.Request
         })
     })
 

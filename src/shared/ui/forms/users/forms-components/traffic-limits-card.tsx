@@ -1,7 +1,15 @@
 import { CreateUserCommand, RESET_PERIODS, UpdateUserCommand } from '@remnawave/backend-contract'
 import { ForwardRefComponent, HTMLMotionProps, Variants } from 'motion/react'
-import { NumberInput, Select, Stack, Text } from '@mantine/core'
-import { DatePickerInput } from '@mantine/dates'
+import {
+    Input,
+    NumberInput,
+    Popover,
+    Select,
+    SimpleGrid,
+    Stack,
+    Text,
+    UnstyledButton
+} from '@mantine/core'
 import { UseFormReturnType } from '@mantine/form'
 import { PiClockDuotone } from 'react-icons/pi'
 import { useTranslation } from 'react-i18next'
@@ -15,13 +23,6 @@ type UserTrafficFormValues = (CreateUserCommand.Request | UpdateUserCommand.Requ
     trafficResetDay?: number
 }
 
-const RESET_DAY_CALENDAR_YEAR = 2024
-const RESET_DAY_CALENDAR_MONTH = 0
-
-const getResetDayCalendarValue = (day: number | undefined) => {
-    return new Date(RESET_DAY_CALENDAR_YEAR, RESET_DAY_CALENDAR_MONTH, day ?? 1)
-}
-
 interface IProps<T extends UserTrafficFormValues> {
     cardVariants: Variants
     form: UseFormReturnType<T>
@@ -29,7 +30,7 @@ interface IProps<T extends UserTrafficFormValues> {
 }
 
 export const TrafficLimitsCard = <T extends UserTrafficFormValues>(props: IProps<T>) => {
-    const { i18n, t } = useTranslation()
+    const { t } = useTranslation()
 
     const { cardVariants, motionWrapper, form } = props
 
@@ -96,36 +97,83 @@ export const TrafficLimitsCard = <T extends UserTrafficFormValues>(props: IProps
                         />
 
                         {form.values.trafficLimitStrategy === RESET_PERIODS.MONTH && (
-                            <DatePickerInput
-                                clearable={false}
-                                description={t(
-                                    'create-user-modal.widget.traffic-reset-day-description'
-                                )}
-                                dropdownType="popover"
-                                firstDayOfWeek={1}
-                                highlightToday={false}
-                                key={form.key('trafficResetDay')}
-                                label={t('create-user-modal.widget.traffic-reset-day')}
-                                leftSection={<TbCalendarEvent size="16px" />}
-                                locale={i18n.language}
-                                maxDate={new Date(RESET_DAY_CALENDAR_YEAR, 0, 31)}
-                                minDate={new Date(RESET_DAY_CALENDAR_YEAR, 0, 1)}
-                                onChange={(date) => {
-                                    if (date) {
-                                        form.setFieldValue(
-                                            'trafficResetDay',
-                                            new Date(date).getDate() as never
-                                        )
-                                    }
-                                }}
-                                value={getResetDayCalendarValue(form.values.trafficResetDay)}
-                                valueFormat={t(
-                                    'create-user-modal.widget.traffic-reset-day-value-format'
-                                )}
-                                styles={{
-                                    label: { fontWeight: 500 }
-                                }}
-                            />
+                            <Stack gap={6}>
+                                <Text fw={500} size="sm">
+                                    {t('create-user-modal.widget.traffic-reset-day')}
+                                </Text>
+                                <Text c="dimmed" size="xs">
+                                    {t('create-user-modal.widget.traffic-reset-day-description')}
+                                </Text>
+                                <Popover position="bottom-start" shadow="md" width={300}>
+                                    <Popover.Target>
+                                        <Input
+                                            component="button"
+                                            leftSection={<TbCalendarEvent size="16px" />}
+                                            pointer
+                                            styles={{
+                                                input: {
+                                                    fontWeight: 400,
+                                                    textAlign: 'left'
+                                                }
+                                            }}
+                                            type="button"
+                                        >
+                                            {t(
+                                                'create-user-modal.widget.traffic-reset-day-display',
+                                                {
+                                                    day: form.values.trafficResetDay ?? 1
+                                                }
+                                            )}
+                                        </Input>
+                                    </Popover.Target>
+                                    <Popover.Dropdown>
+                                        <Text fw={600} mb="sm" size="sm">
+                                            {t(
+                                                'create-user-modal.widget.traffic-reset-day-picker-title'
+                                            )}
+                                        </Text>
+                                        <SimpleGrid cols={7} spacing={4} verticalSpacing={4}>
+                                            {Array.from({ length: 31 }, (_, index) => {
+                                                const day = index + 1
+                                                const selected =
+                                                    day === (form.values.trafficResetDay ?? 1)
+
+                                                return (
+                                                    <UnstyledButton
+                                                        aria-label={t(
+                                                            'create-user-modal.widget.traffic-reset-day-display',
+                                                            { day }
+                                                        )}
+                                                        key={day}
+                                                        onClick={() =>
+                                                            form.setFieldValue(
+                                                                'trafficResetDay',
+                                                                day as never
+                                                            )
+                                                        }
+                                                        style={{
+                                                            alignItems: 'center',
+                                                            aspectRatio: '1',
+                                                            background: selected
+                                                                ? 'var(--mantine-primary-color-filled)'
+                                                                : 'transparent',
+                                                            borderRadius:
+                                                                'var(--mantine-radius-sm)',
+                                                            color: selected
+                                                                ? 'var(--mantine-color-white)'
+                                                                : 'inherit',
+                                                            display: 'flex',
+                                                            justifyContent: 'center'
+                                                        }}
+                                                    >
+                                                        {day}
+                                                    </UnstyledButton>
+                                                )
+                                            })}
+                                        </SimpleGrid>
+                                    </Popover.Dropdown>
+                                </Popover>
+                            </Stack>
                         )}
                     </Stack>
                 </SectionCard.Section>

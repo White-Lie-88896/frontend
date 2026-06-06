@@ -1,10 +1,11 @@
 import { CreateUserCommand, RESET_PERIODS, UpdateUserCommand } from '@remnawave/backend-contract'
 import { ForwardRefComponent, HTMLMotionProps, Variants } from 'motion/react'
 import { NumberInput, Select, Stack, Text } from '@mantine/core'
+import { DatePickerInput } from '@mantine/dates'
 import { UseFormReturnType } from '@mantine/form'
 import { PiClockDuotone } from 'react-icons/pi'
 import { useTranslation } from 'react-i18next'
-import { TbChartLine } from 'react-icons/tb'
+import { TbCalendarEvent, TbChartLine } from 'react-icons/tb'
 
 import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
 import { resetDataStrategy } from '@shared/constants/forms'
@@ -14,16 +15,21 @@ type UserTrafficFormValues = (CreateUserCommand.Request | UpdateUserCommand.Requ
     trafficResetDay?: number
 }
 
+const RESET_DAY_CALENDAR_YEAR = 2024
+const RESET_DAY_CALENDAR_MONTH = 0
+
+const getResetDayCalendarValue = (day: number | undefined) => {
+    return new Date(RESET_DAY_CALENDAR_YEAR, RESET_DAY_CALENDAR_MONTH, day ?? 1)
+}
+
 interface IProps<T extends UserTrafficFormValues> {
     cardVariants: Variants
     form: UseFormReturnType<T>
     motionWrapper: ForwardRefComponent<HTMLDivElement, HTMLMotionProps<'div'>>
 }
 
-export const TrafficLimitsCard = <T extends UserTrafficFormValues>(
-    props: IProps<T>
-) => {
-    const { t } = useTranslation()
+export const TrafficLimitsCard = <T extends UserTrafficFormValues>(props: IProps<T>) => {
+    const { i18n, t } = useTranslation()
 
     const { cardVariants, motionWrapper, form } = props
 
@@ -90,17 +96,32 @@ export const TrafficLimitsCard = <T extends UserTrafficFormValues>(
                         />
 
                         {form.values.trafficLimitStrategy === RESET_PERIODS.MONTH && (
-                            <NumberInput
-                                allowDecimal={false}
-                                allowNegative={false}
-                                clampBehavior="strict"
-                                decimalScale={0}
-                                description={t('create-user-modal.widget.traffic-reset-day-description')}
+                            <DatePickerInput
+                                clearable={false}
+                                description={t(
+                                    'create-user-modal.widget.traffic-reset-day-description'
+                                )}
+                                dropdownType="popover"
+                                firstDayOfWeek={1}
+                                highlightToday={false}
                                 key={form.key('trafficResetDay')}
                                 label={t('create-user-modal.widget.traffic-reset-day')}
-                                max={31}
-                                min={1}
-                                {...form.getInputProps('trafficResetDay')}
+                                leftSection={<TbCalendarEvent size="16px" />}
+                                locale={i18n.language}
+                                maxDate={new Date(RESET_DAY_CALENDAR_YEAR, 0, 31)}
+                                minDate={new Date(RESET_DAY_CALENDAR_YEAR, 0, 1)}
+                                onChange={(date) => {
+                                    if (date) {
+                                        form.setFieldValue(
+                                            'trafficResetDay',
+                                            new Date(date).getDate() as never
+                                        )
+                                    }
+                                }}
+                                value={getResetDayCalendarValue(form.values.trafficResetDay)}
+                                valueFormat={t(
+                                    'create-user-modal.widget.traffic-reset-day-value-format'
+                                )}
                                 styles={{
                                     label: { fontWeight: 500 }
                                 }}

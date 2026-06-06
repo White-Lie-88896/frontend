@@ -14,16 +14,11 @@ import { sToMs } from '@shared/utils/time-utils'
 
 import { createGetQueryHook, errorHandler } from '../../tsq-helpers'
 
-const getUserByUuidResponseSchema = z.intersection(
-    GetUserByUuidCommand.ResponseSchema,
-    z.object({
-        response: z
-            .object({
-                trafficResetDay: z.number().int().min(1).max(31)
-            })
-            .passthrough()
+const getUserByUuidResponseSchema = GetUserByUuidCommand.ResponseSchema.extend({
+    response: GetUserByUuidCommand.ResponseSchema.shape.response.extend({
+        trafficResetDay: z.number().int().min(1).max(31)
     })
-)
+})
 
 export const usersQueryKeys = createQueryKeys('users', {
     getAllUsers: (filters: GetAllUsersCommand.RequestQuery) => ({

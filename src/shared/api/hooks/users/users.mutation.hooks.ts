@@ -39,23 +39,17 @@ const updateUserRequestSchema = z.intersection(
     })
 )
 
-const userResponseExtensionSchema = z.object({
-    response: z
-        .object({
-            trafficResetDay: trafficResetDaySchema
-        })
-        .passthrough()
+const createUserResponseSchema = CreateUserCommand.ResponseSchema.extend({
+    response: CreateUserCommand.ResponseSchema.shape.response.extend({
+        trafficResetDay: trafficResetDaySchema
+    })
 })
 
-const createUserResponseSchema = z.intersection(
-    CreateUserCommand.ResponseSchema,
-    userResponseExtensionSchema
-)
-
-const updateUserResponseSchema = z.intersection(
-    UpdateUserCommand.ResponseSchema,
-    userResponseExtensionSchema
-)
+const updateUserResponseSchema = UpdateUserCommand.ResponseSchema.extend({
+    response: UpdateUserCommand.ResponseSchema.shape.response.extend({
+        trafficResetDay: trafficResetDaySchema
+    })
+})
 
 export const useCreateUser = createMutationHook({
     endpoint: CreateUserCommand.TSQ_url,

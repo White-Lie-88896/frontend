@@ -19,13 +19,48 @@ import {
     UpdateUserCommand
 } from '@remnawave/backend-contract'
 import { notifications } from '@mantine/notifications'
+import { z } from 'zod'
 
 import { createMutationHook } from '../../tsq-helpers'
 
+const trafficResetDaySchema = z.number().int().min(1).max(31)
+
+const createUserRequestSchema = z.intersection(
+    CreateUserCommand.RequestSchema,
+    z.object({
+        trafficResetDay: trafficResetDaySchema.optional()
+    })
+)
+
+const updateUserRequestSchema = z.intersection(
+    UpdateUserCommand.RequestSchema,
+    z.object({
+        trafficResetDay: trafficResetDaySchema.optional()
+    })
+)
+
+const userResponseExtensionSchema = z.object({
+    response: z
+        .object({
+            trafficResetDay: trafficResetDaySchema
+        })
+        .passthrough()
+})
+
+const createUserResponseSchema = z.intersection(
+    CreateUserCommand.ResponseSchema,
+    userResponseExtensionSchema
+)
+
+const updateUserResponseSchema = z.intersection(
+    UpdateUserCommand.ResponseSchema,
+    userResponseExtensionSchema
+)
+
 export const useCreateUser = createMutationHook({
     endpoint: CreateUserCommand.TSQ_url,
-    bodySchema: CreateUserCommand.RequestSchema,
-    responseSchema: CreateUserCommand.ResponseSchema,
+    bodySchema: createUserRequestSchema,
+    responseSchema: createUserResponseSchema,
     requestMethod: CreateUserCommand.endpointDetails.REQUEST_METHOD,
 
     rMutationParams: {
@@ -49,8 +84,8 @@ export const useCreateUser = createMutationHook({
 
 export const useUpdateUser = createMutationHook({
     endpoint: UpdateUserCommand.TSQ_url,
-    bodySchema: UpdateUserCommand.RequestSchema,
-    responseSchema: UpdateUserCommand.ResponseSchema,
+    bodySchema: updateUserRequestSchema,
+    responseSchema: updateUserResponseSchema,
     requestMethod: UpdateUserCommand.endpointDetails.REQUEST_METHOD,
     rMutationParams: {
         onSuccess: () => {

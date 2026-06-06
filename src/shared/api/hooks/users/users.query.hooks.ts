@@ -8,10 +8,22 @@ import {
 } from '@remnawave/backend-contract'
 import { createQueryKeys } from '@lukemorales/query-key-factory'
 import { keepPreviousData } from '@tanstack/react-query'
+import { z } from 'zod'
 
 import { sToMs } from '@shared/utils/time-utils'
 
 import { createGetQueryHook, errorHandler } from '../../tsq-helpers'
+
+const getUserByUuidResponseSchema = z.intersection(
+    GetUserByUuidCommand.ResponseSchema,
+    z.object({
+        response: z
+            .object({
+                trafficResetDay: z.number().int().min(1).max(31)
+            })
+            .passthrough()
+    })
+)
 
 export const usersQueryKeys = createQueryKeys('users', {
     getAllUsers: (filters: GetAllUsersCommand.RequestQuery) => ({
@@ -38,7 +50,7 @@ export const usersQueryKeys = createQueryKeys('users', {
 
 export const useGetUserByUuid = createGetQueryHook({
     endpoint: GetUserByUuidCommand.TSQ_url,
-    responseSchema: GetUserByUuidCommand.ResponseSchema,
+    responseSchema: getUserByUuidResponseSchema,
     routeParamsSchema: GetUserByUuidCommand.RequestSchema,
     getQueryKey: ({ route }) => usersQueryKeys.getUserByUuid(route!).queryKey,
     rQueryParams: {

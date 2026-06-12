@@ -1,5 +1,9 @@
 {
     "constants": {
+        "system-diagnostics": "System Diagnostics",
+        "system": "System",
+        "audit-logs": "Audit Logs",
+        "proxy-access-audit": "Access Audit",
         "dashboard": "داشبورد",
         "config": "Xray کانفیگ",
         "home": "خانه",
@@ -29,6 +33,24 @@
         "node-plugins": "Plugins",
         "tb-reports": "Torrent Blocker Reports",
         "sessions-explorer": "Sessions Explorer"
+    },
+    "audit-logs": {
+        "description": "Review important administrator, API, and system operations",
+        "actor": "Actor",
+        "actor-type": "Actor type",
+        "action": "Action",
+        "resource": "Resource",
+        "resource-type": "Resource type",
+        "result": "Result",
+        "message": "Message",
+        "time": "Time",
+        "start-time": "Start time",
+        "end-time": "End time",
+        "apply": "Apply filters",
+        "clear": "Clear filters",
+        "details": "Audit details",
+        "empty": "No audit records",
+        "total": "{{count}} records"
     },
     "common": {
         "delete": "حذف",
@@ -526,6 +548,7 @@
     },
     "data-usage": {
         "column": {
+            "current-cycle": "دوره جاری",
             "monthly": "ماهانه",
             "weekly": "هفتگی",
             "daily": "روزانه",

@@ -1,6 +1,7 @@
-import { ActionIcon, CopyButton, Input } from '@mantine/core'
+import { ActionIcon, Input } from '@mantine/core'
 import { PiCheck, PiCopy } from 'react-icons/pi'
 
+import { RobustCopyButton } from '../robust-copy-button/robust-copy-button'
 import classes from './copyable-field.module.css'
 
 export const CopyableFieldShared = ({
@@ -15,7 +16,7 @@ export const CopyableFieldShared = ({
     value: number | string
 }) => {
     return (
-        <CopyButton timeout={2000} value={value.toString()}>
+        <RobustCopyButton timeout={2000} value={value.toString()}>
             {({ copied, copy }) => (
                 <Input.Wrapper label={label}>
                     <div className={classes.inputWrapper}>
@@ -44,6 +45,6 @@ export const CopyableFieldShared = ({
                     </div>
                 </Input.Wrapper>
             )}
-        </CopyButton>
+        </RobustCopyButton>
     )
 }

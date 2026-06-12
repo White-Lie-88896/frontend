@@ -1,4 +1,16 @@
 import {
+    PiAirTrafficControlDuotone,
+    PiArrowsInCardinalFill,
+    PiChartLine,
+    PiClipboardTextDuotone,
+    PiCpu,
+    PiListChecks,
+    PiShareNetworkDuotone,
+    PiShieldCheckDuotone,
+    PiStarDuotone,
+    PiUsersDuotone
+} from 'react-icons/pi'
+import {
     TbChartArcs,
     TbCirclesRelation,
     TbDeviceAnalytics,
@@ -11,22 +23,13 @@ import {
     TbRoute,
     TbWebhook
 } from 'react-icons/tb'
-import {
-    PiAirTrafficControlDuotone,
-    PiArrowsInCardinalFill,
-    PiChartLine,
-    PiCpu,
-    PiListChecks,
-    PiStarDuotone,
-    PiUsersDuotone
-} from 'react-icons/pi'
-import { SUBSCRIPTION_TEMPLATE_TYPE } from '@remnawave/backend-contract'
 import { HiChartPie, HiCurrencyDollar, HiServer } from 'react-icons/hi'
 import { useTranslation } from 'react-i18next'
 import { useHotkeys } from '@mantine/hooks'
 import { useState } from 'react'
 
 import { HappLogo, MihomoLogo, SingboxLogo, StashLogo, XrayLogo } from '@shared/ui/logos'
+import { SUBSCRIPTION_TEMPLATE_TYPE } from '@remnawave/backend-contract'
 import { ROUTES } from '@shared/constants'
 import { Logo } from '@shared/ui'
 
@@ -243,6 +246,42 @@ export const useMenuSections = (): MenuItem[] => {
                     href: ROUTES.DASHBOARD.TOOLS.SESSIONS_EXPLORER,
                     icon: TbRadar2,
                     id: 'sessions-explorer'
+                }
+            ]
+        },
+        {
+            header: t('constants.system'),
+            id: 'system',
+            section: [
+                {
+                    name: t('constants.system-diagnostics'),
+                    href: ROUTES.DASHBOARD.SYSTEM.DIAGNOSTICS,
+                    icon: TbDeviceAnalytics,
+                    id: 'system-diagnostics'
+                },
+                {
+                    name: t('constants.audit-logs'),
+                    href: ROUTES.DASHBOARD.SYSTEM.AUDIT_LOGS,
+                    icon: PiClipboardTextDuotone,
+                    id: 'audit-logs'
+                },
+                {
+                    name: t('constants.proxy-access-audit'),
+                    href: ROUTES.DASHBOARD.SYSTEM.PROXY_ACCESS_AUDIT,
+                    icon: PiChartLine,
+                    id: 'proxy-access-audit'
+                },
+                {
+                    name: t('constants.egress-rules'),
+                    href: ROUTES.DASHBOARD.SYSTEM.EGRESS_RULES,
+                    icon: PiShieldCheckDuotone,
+                    id: 'egress-rules'
+                },
+                {
+                    name: 'Remote Nodes',
+                    href: ROUTES.DASHBOARD.SYSTEM.PROXY_LIBRARY,
+                    icon: PiShareNetworkDuotone,
+                    id: 'proxy-library'
                 }
             ]
         },

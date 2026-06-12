@@ -39,7 +39,13 @@ export interface ModalInternalStates {
     CREATE_HOST_MODAL: undefined
     CREATE_INFRA_BILLING_NODE_MODAL: undefined
     CREATE_INFRA_BILLING_RECORD_DRAWER: undefined
-    CREATE_INFRA_PROVIDER_DRAWER: undefined
+    CREATE_INFRA_PROVIDER_DRAWER:
+        | {
+              onCreated?: (
+                  provider: GetInfraProvidersCommand.Response['response']['providers'][number]
+              ) => void
+          }
+        | undefined
     EDIT_HOST_MODAL: UpdateHostCommand.Response['response']
     EDIT_NODE_BY_UUID_MODAL: {
         nodeUuid: string
@@ -66,8 +72,12 @@ export interface ModalInternalStates {
         nodeUuid: string
     }
     UPDATE_BILLING_DATE_MODAL: {
+        billingAmount?: number
+        billingCycle?: 'MONTHLY' | 'YEARLY'
+        billingCurrency?: 'USD' | 'CNY' | 'EUR'
         callback?: () => void
         nextBillingAt?: Date
+        reminderDays?: number[]
         uuids: string[]
     }
     USER_ACCESSIBLE_NODES_DRAWER: {

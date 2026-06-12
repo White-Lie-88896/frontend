@@ -12,7 +12,6 @@ export function DataUsageColumnEntity(props: IProps) {
 
     const usedBytes = user.userTraffic.usedTrafficBytes
     const limitBytes = user.trafficLimitBytes
-    const lifetimeBytes = user.userTraffic.lifetimeUsedTrafficBytes
     const isUnlimited = limitBytes === 0
     const percentage = isUnlimited ? 0 : (usedBytes * 100) / limitBytes
 
@@ -25,7 +24,6 @@ export function DataUsageColumnEntity(props: IProps) {
     }[user.trafficLimitStrategy]
 
     const prettyUsedData = prettyBytesUtil(usedBytes) || '0 B'
-    const prettyLifetimeData = prettyBytesUtil(lifetimeBytes) || '0 B'
     const maxData = isUnlimited ? '∞' : prettyBytesUtil(limitBytes) || '∞'
 
     const getProgressColor = () => {
@@ -47,7 +45,7 @@ export function DataUsageColumnEntity(props: IProps) {
                 </Text>
                 <Text c="teal.5" fw={700} fz="xs">
                     <Text c="dimmed" component="span" fw={550} fz="xs" size="xs">
-                        Σ {prettyLifetimeData}
+                        {t('data-usage.column.current-cycle')} {prettyUsedData}
                     </Text>{' '}
                     {(100 - percentage).toFixed(2)}%
                 </Text>

@@ -1,53 +1,59 @@
-import { MdCalendarToday, MdPayment, MdTrendingUp } from 'react-icons/md'
 import { useTranslation } from 'react-i18next'
-import { FaServer } from 'react-icons/fa'
+import { TbCalendarDollar, TbCalendarExclamation } from 'react-icons/tb'
+import { MdPayment, MdTrendingUp } from 'react-icons/md'
 import { Grid } from '@mantine/core'
-import dayjs from 'dayjs'
 
 import { IMetricCardProps, MetricCardShared } from '@shared/ui/metrics/metric-card'
 import { useGetInfraBillingNodes } from '@shared/api/hooks'
-import { formatCurrency } from '@shared/utils/misc'
+
+import { formatBillingCostBreakdown } from '../billing-cost.utils'
 
 export function StatsWidget() {
-    const currentDate = dayjs()
-    const currentMonth = currentDate.format('MMMM YYYY')
-    const currentMonthOnly = currentDate.format('MMMM')
-    const currentDay = currentDate.format('D')
-
     const { data: nodes, isLoading } = useGetInfraBillingNodes()
     const { t } = useTranslation()
+    const renewalCosts = nodes?.stats.renewalCostsByCurrency ?? []
 
     const stats: IMetricCardProps[] = [
         {
-            title: t('stats.widget.current-date'),
-            value: currentDay,
-            subtitle: currentMonth,
-            IconComponent: MdCalendarToday,
-            iconColor: 'blue',
+            title: t('stats.widget.monthly-renewal-cost'),
+            value: formatBillingCostBreakdown(
+                renewalCosts.map((cost) => ({
+                    amount: cost.monthlyRenewalCost,
+                    currency: cost.currency
+                }))
+            ),
+            subtitle: t('stats.widget.normalized-monthly-cost'),
+            IconComponent: TbCalendarDollar,
+            iconColor: 'pink',
             iconVariant: 'soft'
         },
         {
-            title: t('stats.widget.upcoming-in', { month: currentMonthOnly }),
-            value: nodes?.stats.upcomingNodesCount ?? 0,
-            subtitle: t('stats.widget.nodes-pending-payment'),
-            IconComponent: FaServer,
+            title: t('stats.widget.yearly-renewal-cost'),
+            value: formatBillingCostBreakdown(
+                renewalCosts.map((cost) => ({
+                    amount: cost.yearlyRenewalCost,
+                    currency: cost.currency
+                }))
+            ),
+            subtitle: t('stats.widget.normalized-yearly-cost'),
+            IconComponent: MdTrendingUp,
+            iconColor: 'violet',
+            iconVariant: 'soft'
+        },
+        {
+            title: t('stats.widget.due-soon'),
+            value: nodes?.stats.dueSoonNodesCount ?? 0,
+            subtitle: t('stats.widget.within-seven-days'),
+            IconComponent: MdPayment,
             iconColor: 'orange',
             iconVariant: 'soft'
         },
         {
-            title: t('stats.widget.payments-in', { month: currentMonthOnly }),
-            value: formatCurrency(nodes?.stats.currentMonthPayments ?? 0),
-            subtitle: t('stats.widget.total-payments-made'),
-            IconComponent: MdPayment,
-            iconColor: 'green',
-            iconVariant: 'soft'
-        },
-        {
-            title: t('stats.widget.total-spent'),
-            value: formatCurrency(nodes?.stats.totalSpent ?? 0),
-            subtitle: t('stats.widget.lifetime-spending'),
-            IconComponent: MdTrendingUp,
-            iconColor: 'violet',
+            title: t('stats.widget.overdue'),
+            value: nodes?.stats.overdueNodesCount ?? 0,
+            subtitle: t('stats.widget.needs-attention'),
+            IconComponent: TbCalendarExclamation,
+            iconColor: 'red',
             iconVariant: 'soft'
         }
     ]

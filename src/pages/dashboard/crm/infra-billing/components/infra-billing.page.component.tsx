@@ -12,6 +12,7 @@ import { InfraBillingRecordsTableWidget } from '@widgets/dashboard/infra-billing
 import { ViewInfraProviderDrawerWidget } from '@widgets/dashboard/infra-billing/view-infra-provider-drawer/view-infra-provider.drawer.widget'
 import { InfraBillingNodesTableWidget } from '@widgets/dashboard/infra-billing/infra-billing-nodes-table/infra-billing-nodes.widget'
 import { InfraProvidersTableWidget } from '@widgets/dashboard/infra-billing/infra-providers-table/infra-providers-table.widget'
+import { ProviderRenewalCostsWidget } from '@widgets/dashboard/infra-billing/provider-renewal-costs-widget/provider-renewal-costs.widget'
 import { UpdateBillingDateModalWidget } from '@widgets/dashboard/infra-billing/update-billing-date-modal'
 import { StatsWidget } from '@widgets/dashboard/infra-billing/stats-widget/stats.widget'
 import { MobileInfraBillingWidget } from '@widgets/dashboard/infra-billing/mobile'
@@ -50,18 +51,28 @@ export const InfraBillingPageComponent = () => {
 
                         <Stack>
                             <Split spacing="sm" variant="dotted">
-                                <Split.Pane initialWidth="60%">
-                                    <InfraBillingNodesTableWidget />
+                                <Split.Pane initialWidth="32%">
+                                    <ProviderRenewalCostsWidget />
                                 </Split.Pane>
 
                                 <Split.Resizer />
 
-                                <Split.Pane grow initialWidth="40%">
-                                    <InfraBillingRecordsTableWidget />
+                                <Split.Pane grow initialWidth="68%">
+                                    <InfraBillingNodesTableWidget />
                                 </Split.Pane>
                             </Split>
 
-                            <InfraProvidersTableWidget />
+                            <Split spacing="sm" variant="dotted">
+                                <Split.Pane initialWidth="50%">
+                                    <InfraBillingRecordsTableWidget />
+                                </Split.Pane>
+
+                                <Split.Resizer />
+
+                                <Split.Pane grow initialWidth="50%">
+                                    <InfraProvidersTableWidget />
+                                </Split.Pane>
+                            </Split>
                         </Stack>
                     </>
                 )}

@@ -16,7 +16,6 @@ import { useTranslation } from 'react-i18next'
 import { PiEmpty } from 'react-icons/pi'
 import { modals } from '@mantine/modals'
 import { useState } from 'react'
-import dayjs from 'dayjs'
 
 import {
     QueryKeys,
@@ -28,10 +27,11 @@ import { MODALS, useModalsStoreOpenWithData } from '@entities/dashboard/modal-st
 import { DataTableShared } from '@shared/ui/table'
 import { queryClient } from '@shared/api'
 
+import { getNextBillingDate } from '../billing-cost.utils'
 import { getInfraBillingNodesColumns } from './use-infra-billing-nodes-columns'
 
 const PAGE_SIZE = 500
-const INFRA_BILLING_NODES_CACHE_KEY = 'infra-billing-nodes-columns'
+const INFRA_BILLING_NODES_CACHE_KEY = 'infra-billing-nodes-columns-v2'
 
 export function InfraBillingNodesTableWidget() {
     const {
@@ -95,12 +95,14 @@ export function InfraBillingNodesTableWidget() {
         })
 
     const handleQuickUpdateNextBillingAt = (uuid: string, currentDate: Date) => {
+        const node = infraBillingNodes?.billingNodes.find((billingNode) => billingNode.uuid === uuid)
+
         setUpdatingUuids((prev) => new Set(prev).add(uuid))
         updateNode({
             variables: {
                 uuids: [uuid],
                 // @ts-expect-error - TODO: fix ZOD schema
-                nextBillingAt: dayjs(currentDate).add(1, 'month').toISOString()
+                nextBillingAt: getNextBillingDate(currentDate, node?.billingCycle).toISOString()
             }
         })
     }
@@ -109,6 +111,7 @@ export function InfraBillingNodesTableWidget() {
         key: INFRA_BILLING_NODES_CACHE_KEY,
         columns: getInfraBillingNodesColumns(
             handleQuickUpdateNextBillingAt,
+            (node) => handleClickBillingAt(node),
             (uuid) => updatingUuids.has(uuid),
             t
         )
@@ -118,6 +121,10 @@ export function InfraBillingNodesTableWidget() {
         node: GetInfraBillingNodesCommand.Response['response']['billingNodes'][number]
     ) => {
         openModalWithData(MODALS.UPDATE_BILLING_DATE_MODAL, {
+            billingAmount: node.billingAmount,
+            billingCycle: node.billingCycle,
+            billingCurrency: node.billingCurrency,
+            reminderDays: node.reminderDays,
             uuids: [node.uuid],
             nextBillingAt: node.nextBillingAt
         })
@@ -247,7 +254,11 @@ export function InfraBillingNodesTableWidget() {
                     if (record.provider.loginUrl && column.accessor === 'provider.name') {
                         window.open(record.provider.loginUrl, '_blank', 'noopener,noreferrer')
                     }
-                    if (column.accessor === 'nextBillingAt') {
+                    if (
+                        column.accessor === 'nextBillingAt' ||
+                        column.accessor === 'billingAmount' ||
+                        column.accessor === 'renewalStatus'
+                    ) {
                         handleClickBillingAt(record)
                     }
                 }}

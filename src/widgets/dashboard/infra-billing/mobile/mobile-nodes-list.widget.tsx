@@ -8,7 +8,7 @@ import {
     Text,
     ThemeIcon
 } from '@mantine/core'
-import { TbCalendar, TbCheck, TbCreditCard, TbServer } from 'react-icons/tb'
+import { TbCalendar, TbCheck, TbCreditCard, TbCurrencyDollar, TbServer } from 'react-icons/tb'
 import { GetInfraBillingNodesCommand } from '@remnawave/backend-contract'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
@@ -20,6 +20,13 @@ import { QueryKeys, useUpdateInfraBillingNode } from '@shared/api/hooks'
 import { formatTimeUtil } from '@shared/utils/time-utils'
 import { SectionCard } from '@shared/ui/section-card'
 import { queryClient } from '@shared/api'
+
+import {
+    formatBillingCurrency,
+    getBillingCycleLabel,
+    getNextBillingDate,
+    getRenewalStatus
+} from '../billing-cost.utils'
 
 type BillingNode = GetInfraBillingNodesCommand.Response['response']['billingNodes'][number]
 
@@ -57,18 +64,24 @@ export function MobileNodesListWidget(props: IProps) {
     })
 
     const handleQuickUpdate = (uuid: string, currentDate: Date) => {
+        const node = nodes.find((billingNode) => billingNode.uuid === uuid)
+
         setUpdatingUuids((prev) => new Set(prev).add(uuid))
         updateNode({
             variables: {
                 uuids: [uuid],
                 // @ts-expect-error - TODO: fix ZOD schema
-                nextBillingAt: dayjs(currentDate).add(1, 'month').toISOString()
+                nextBillingAt: getNextBillingDate(currentDate, node?.billingCycle).toISOString()
             }
         })
     }
 
     const handleClickBillingAt = (node: BillingNode) => {
         openModalWithData(MODALS.UPDATE_BILLING_DATE_MODAL, {
+            billingAmount: node.billingAmount,
+            billingCycle: node.billingCycle,
+            billingCurrency: node.billingCurrency,
+            reminderDays: node.reminderDays,
             uuids: [node.uuid],
             nextBillingAt: node.nextBillingAt
         })
@@ -100,6 +113,11 @@ export function MobileNodesListWidget(props: IProps) {
         <Stack gap="xs" style={style}>
             {nodes.map((node) => {
                 const status = getNodeStatus(node.nextBillingAt, i18n.language)
+                const renewalStatus = getRenewalStatus({
+                    billingAmount: node.billingAmount,
+                    nextBillingAt: node.nextBillingAt,
+                    t
+                })
 
                 return (
                     <SectionCard.Root key={node.uuid}>
@@ -116,52 +134,72 @@ export function MobileNodesListWidget(props: IProps) {
                                 />
 
                                 <Badge
-                                    color={status.color}
+                                    color={renewalStatus.color}
                                     leftSection={<TbCreditCard size={16} />}
                                     radius="sm"
                                     size="md"
                                     variant="soft"
                                 >
-                                    {status.label}
+                                    {renewalStatus.label}
                                 </Badge>
                             </Group>
                         </SectionCard.Section>
 
                         <SectionCard.Section>
-                            <Group justify="space-between" wrap="nowrap">
-                                <Group
-                                    gap={6}
-                                    onClick={() => handleClickBillingAt(node)}
-                                    style={{ cursor: 'pointer' }}
-                                    wrap="nowrap"
-                                >
-                                    <TbCalendar
-                                        color={`var(--mantine-color-${status.color}-5)`}
-                                        size={16}
-                                    />
-                                    <Text c={status.color} fw={600} size="sm">
-                                        {formatTimeUtil({
-                                            time: node.nextBillingAt,
-                                            template: 'FULL_DATE',
-                                            language: i18n.language
-                                        })}
-                                    </Text>
+                            <Stack gap="xs">
+                                <Group justify="space-between" wrap="nowrap">
+                                    <Group
+                                        gap={6}
+                                        onClick={() => handleClickBillingAt(node)}
+                                        style={{ cursor: 'pointer' }}
+                                        wrap="nowrap"
+                                    >
+                                        <TbCalendar
+                                            color={`var(--mantine-color-${status.color}-5)`}
+                                            size={16}
+                                        />
+                                        <Text c={status.color} fw={600} size="sm">
+                                            {formatTimeUtil({
+                                                time: node.nextBillingAt,
+                                                template: 'FULL_DATE',
+                                                language: i18n.language
+                                            })}
+                                        </Text>
+                                    </Group>
+
+                                    <Group gap={4} wrap="nowrap">
+                                        <ActionIcon
+                                            color="teal"
+                                            loading={updatingUuids.has(node.uuid)}
+                                            onClick={() =>
+                                                handleQuickUpdate(node.uuid, node.nextBillingAt)
+                                            }
+                                            size="input-xs"
+                                            variant="soft"
+                                        >
+                                            <TbCheck size={18} />
+                                        </ActionIcon>
+                                    </Group>
                                 </Group>
 
-                                <Group gap={4} wrap="nowrap">
-                                    <ActionIcon
-                                        color="teal"
-                                        loading={updatingUuids.has(node.uuid)}
-                                        onClick={() =>
-                                            handleQuickUpdate(node.uuid, node.nextBillingAt)
-                                        }
-                                        size="input-xs"
-                                        variant="soft"
-                                    >
-                                        <TbCheck size={18} />
-                                    </ActionIcon>
+                                <Group gap={6} wrap="nowrap">
+                                    <TbCurrencyDollar
+                                        color="var(--mantine-color-pink-5)"
+                                        size={16}
+                                    />
+                                    <Text fw={700} size="sm">
+                                        {node.billingAmount > 0
+                                            ? formatBillingCurrency(
+                                                  node.billingAmount,
+                                                  node.billingCurrency
+                                              )
+                                            : '-'}
+                                    </Text>
+                                    <Text c="dimmed" size="xs">
+                                        {getBillingCycleLabel(node.billingCycle, t)}
+                                    </Text>
                                 </Group>
-                            </Group>
+                            </Stack>
                         </SectionCard.Section>
                     </SectionCard.Root>
                 )

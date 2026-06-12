@@ -21,14 +21,16 @@ import {
     PiTelegramLogoDuotone,
     PiX
 } from 'react-icons/pi'
-import { BulkAllUpdateUsersCommand } from '@remnawave/backend-contract'
+import { BulkAllUpdateUsersCommand, RESET_PERIODS } from '@remnawave/backend-contract'
 import { zodResolver } from 'mantine-form-zod-resolver'
 import { Trans, useTranslation } from 'react-i18next'
 import { DateTimePicker } from '@mantine/dates'
 import { TbDevices2 } from 'react-icons/tb'
 import { useForm } from '@mantine/form'
 import dayjs from 'dayjs'
+import { z } from 'zod'
 
+import { TrafficResetDayPicker } from '@shared/ui/forms/users/forms-components/traffic-reset-day-picker'
 import { CreateableTagInputShared } from '@shared/ui/createable-tag-input/createable-tag-input'
 import { userStatusValues } from '@shared/constants/forms/user-status.constants'
 import { useBulkAllUpdateUsers, useGetUserTags } from '@shared/api/hooks'
@@ -38,17 +40,26 @@ import { gbToBytesUtil } from '@shared/utils/bytes'
 
 import { IProps } from './interfaces/props.interface'
 
+type BulkAllUpdateUsersRequest = BulkAllUpdateUsersCommand.Request & {
+    trafficResetDay?: number
+}
+
+const bulkAllUpdateUsersSchema = BulkAllUpdateUsersCommand.RequestSchema.extend({
+    trafficResetDay: z.number().int().min(1).max(31).optional()
+})
+
 export const BulkAllUserActionsUpdateTabFeature = (props: IProps) => {
     const { t, i18n } = useTranslation()
     const { cleanUpDrawer } = props
 
-    const form = useForm<BulkAllUpdateUsersCommand.Request>({
-        mode: 'uncontrolled',
+    const form = useForm<BulkAllUpdateUsersRequest>({
+        mode: 'controlled',
         name: 'bulk-all-user-actions-form',
         initialValues: {
             status: undefined,
             trafficLimitBytes: undefined,
             trafficLimitStrategy: undefined,
+            trafficResetDay: undefined,
             expireAt: undefined,
             description: undefined,
             telegramId: undefined,
@@ -56,7 +67,7 @@ export const BulkAllUserActionsUpdateTabFeature = (props: IProps) => {
             hwidDeviceLimit: undefined
         },
         validate: zodResolver(
-            BulkAllUpdateUsersCommand.RequestSchema.omit({
+            bulkAllUpdateUsersSchema.omit({
                 expireAt: true,
                 telegramId: true,
                 email: true
@@ -155,7 +166,23 @@ export const BulkAllUserActionsUpdateTabFeature = (props: IProps) => {
                     leftSection={<PiClockDuotone size="16px" />}
                     placeholder={t('create-user-modal.widget.pick-value')}
                     {...form.getInputProps('trafficLimitStrategy')}
+                    onChange={(value) => {
+                        form.setFieldValue('trafficLimitStrategy', value as never)
+                        form.setFieldValue(
+                            'trafficResetDay',
+                            value === RESET_PERIODS.MONTH
+                                ? (form.values.trafficResetDay ?? 1)
+                                : undefined
+                        )
+                    }}
                 />
+
+                {form.values.trafficLimitStrategy === RESET_PERIODS.MONTH && (
+                    <TrafficResetDayPicker
+                        onChange={(day) => form.setFieldValue('trafficResetDay', day)}
+                        value={form.values.trafficResetDay}
+                    />
+                )}
 
                 <DateTimePicker
                     clearable

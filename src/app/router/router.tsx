@@ -32,9 +32,14 @@ import { HostsPageConnector } from '@pages/dashboard/hosts/ui/connectors'
 import { UsersPageConnector } from '@pages/dashboard/users/ui/connectors'
 import { NodesPageConnector } from '@pages/dashboard/nodes/ui/connectors'
 import { HomePageConnector } from '@pages/dashboard/home/connectors'
+import { ProxyLibraryPage } from '@pages/dashboard/proxy-library'
+import { SystemDiagnosticsPage } from '@pages/dashboard/system-diagnostics'
 import { NotFoundPageComponent } from '@pages/errors/4xx-error'
+import { EgressRulesPage } from '@pages/dashboard/egress-rules'
+import { ProxyAccessAuditPage } from '@pages/dashboard/proxy-access-audit'
 import { ErrorBoundaryHoc } from '@shared/hocs/error-boundary'
 import { ErrorPageComponent } from '@pages/errors/5xx-error'
+import { AuditLogsPage } from '@pages/dashboard/audit-logs'
 import { AuthGuard } from '@shared/hocs/guards/auth-guard'
 import { LoginPage } from '@pages/auth/login'
 
@@ -175,6 +180,29 @@ const router = createBrowserRouter(
                         <Route
                             element={<InfraBillingPageConnector />}
                             path={ROUTES.DASHBOARD.CRM.INFRA_BILLING}
+                        />
+                    </Route>
+
+                    <Route path={ROUTES.DASHBOARD.SYSTEM.ROOT}>
+                        <Route
+                            element={<SystemDiagnosticsPage />}
+                            path={ROUTES.DASHBOARD.SYSTEM.DIAGNOSTICS}
+                        />
+                        <Route
+                            element={<AuditLogsPage />}
+                            path={ROUTES.DASHBOARD.SYSTEM.AUDIT_LOGS}
+                        />
+                        <Route
+                            element={<ProxyAccessAuditPage />}
+                            path={ROUTES.DASHBOARD.SYSTEM.PROXY_ACCESS_AUDIT}
+                        />
+                        <Route
+                            element={<EgressRulesPage />}
+                            path={ROUTES.DASHBOARD.SYSTEM.EGRESS_RULES}
+                        />
+                        <Route
+                            element={<ProxyLibraryPage />}
+                            path={ROUTES.DASHBOARD.SYSTEM.PROXY_LIBRARY}
                         />
                     </Route>
                 </Route>

@@ -1,5 +1,10 @@
 {
     "constants": {
+        "system-diagnostics": "系统诊断",
+        "system": "系统",
+        "audit-logs": "审计日志",
+        "proxy-access-audit": "访问审计",
+        "egress-rules": "安全出口规则",
         "dashboard": "仪表",
         "config": "Xray 配置",
         "home": "首页",
@@ -1025,7 +1030,32 @@
             "today": "今天",
             "tomorrow": "明天",
             "next-month": "下个月",
-            "update-date": "更新日期"
+            "update-date": "更新日期",
+            "billing-amount": "续费金额",
+            "billing-cycle": "续费周期",
+            "update-renewal": "更新续费"
+        }
+    },
+    "billing-cost": {
+        "cycle": {
+            "monthly": "月付",
+            "yearly": "年付"
+        },
+        "status": {
+            "normal": "正常",
+            "due-soon": "即将到期",
+            "overdue": "已逾期",
+            "unconfigured": "未配置"
+        }
+    },
+    "provider-renewal-costs": {
+        "widget": {
+            "service-provider-costs": "服务商成本",
+            "provider": "服务商",
+            "monthly": "月",
+            "yearly": "年",
+            "nodes-count": "{{count}} 台",
+            "no-costs-found": "暂无续费成本。"
         }
     },
     "infra-providers-table": {
@@ -1069,8 +1099,12 @@
     "use-infra-billing-nodes-columns": {
         "hoster-name": "主机商名称",
         "node": "节点",
+        "cost": "费用",
         "next-billing-at": "下一计费时间",
-        "quick-update-to-next-month": "下个月快速更新"
+        "status": "状态",
+        "edit-renewal": "编辑续费",
+        "quick-update-to-next-month": "下个月快速更新",
+        "quick-update-to-next-cycle": "按周期快速更新"
     },
     "next-billing-at-cell": {
         "in-current-month": "本月内",
@@ -1100,6 +1134,8 @@
                 "error": "错误",
                 "please-select-a-provider-and-billing-node": "请选择一个网络提供商和计费节点",
                 "billing-node": "计费节点",
+                "billing-amount": "续费金额",
+                "billing-cycle": "续费周期",
                 "next-billing-at": "下次计费时间",
                 "next-billing-at-description": "计费节点将被计费的日期和时间。Remnawave 将会通知你即将到来的账单。"
             }
@@ -1242,7 +1278,15 @@
             "payments-in": "{{month}} 的付款",
             "total-payments-made": "已完成付款总数",
             "total-spent": "总支出",
-            "lifetime-spending": "累计支出"
+            "lifetime-spending": "累计支出",
+            "monthly-renewal-cost": "月成本",
+            "normalized-monthly-cost": "折算后的每月续费",
+            "yearly-renewal-cost": "年成本",
+            "normalized-yearly-cost": "折算后的年度续费",
+            "due-soon": "即将到期",
+            "within-seven-days": "7 天内",
+            "overdue": "已逾期",
+            "needs-attention": "需要处理"
         }
     },
     "edit-node-by-uuid-modal": {
@@ -2121,7 +2165,11 @@
             "billing-nodes": "计费节点",
             "upcoming": "即将到来",
             "per-month": "每月",
-            "total-spent": "合计花费"
+            "total-spent": "合计花费",
+            "monthly-cost": "月成本",
+            "yearly-cost": "年成本",
+            "due-soon": "即将到期",
+            "overdue": "已逾期"
         }
     },
     "mobile-providers-list": {
@@ -2134,5 +2182,28 @@
             "history": "历史",
             "providers": "服务商"
         }
+    },
+    "egress-rules": {
+        "title": "安全出口规则",
+        "description": "配置出口安全规则以禁止特定的域名、IP 地址、端口或协议走黑洞匹配。",
+        "new-rule": "新增规则",
+        "edit-rule": "编辑规则",
+        "pattern": "匹配规则",
+        "action": "执行动作",
+        "is-enabled": "是否启用",
+        "rule-name": "规则名称",
+        "rule-description": "规则描述",
+        "rule-pattern": "匹配规则",
+        "rule-action": "执行动作",
+        "rule-is-enabled": "是否启用",
+        "rules": "规则",
+        "empty": "暂无安全出口规则",
+        "test-rule": "规则匹配测试",
+        "test-pattern": "测试文本/域名/IP",
+        "test": "测试",
+        "test-result": "测试结果",
+        "matched": "匹配拦截",
+        "not-matched": "未匹配（直连/代理）",
+        "reordered": "重排规则优先级成功"
     }
 }

@@ -21,7 +21,7 @@ import {
     PiTelegramLogoDuotone,
     PiX
 } from 'react-icons/pi'
-import { BulkUpdateUsersCommand } from '@remnawave/backend-contract'
+import { BulkUpdateUsersCommand, RESET_PERIODS } from '@remnawave/backend-contract'
 import { zodResolver } from 'mantine-form-zod-resolver'
 import { TbDevices2, TbWebhook } from 'react-icons/tb'
 import { Trans, useTranslation } from 'react-i18next'
@@ -30,6 +30,7 @@ import { useForm } from '@mantine/form'
 import dayjs from 'dayjs'
 import { z } from 'zod'
 
+import { TrafficResetDayPicker } from '@shared/ui/forms/users/forms-components/traffic-reset-day-picker'
 import { useBulkUsersActionsStoreActions } from '@entities/dashboard/users/bulk-users-actions-store'
 import { CreateableTagInputShared } from '@shared/ui/createable-tag-input/createable-tag-input'
 import { useBulkUpdateUsers, useGetExternalSquads, useGetUserTags } from '@shared/api/hooks'
@@ -40,7 +41,15 @@ import { gbToBytesUtil } from '@shared/utils/bytes'
 
 import { IProps } from './interfaces/props.interface'
 
-const originalFieldsSchema = BulkUpdateUsersCommand.RequestSchema.shape.fields
+type BulkUpdateUsersRequest = Omit<BulkUpdateUsersCommand.Request, 'fields'> & {
+    fields: BulkUpdateUsersCommand.Request['fields'] & {
+        trafficResetDay?: number
+    }
+}
+
+const originalFieldsSchema = BulkUpdateUsersCommand.RequestSchema.shape.fields.extend({
+    trafficResetDay: z.number().int().min(1).max(31).optional()
+})
 
 const fieldsWithoutExpireAt = originalFieldsSchema.omit({
     expireAt: true,
@@ -58,8 +67,8 @@ export const BulkUserActionsUpdateTabFeature = (props: IProps) => {
 
     const actions = useBulkUsersActionsStoreActions()
 
-    const form = useForm<BulkUpdateUsersCommand.Request>({
-        mode: 'uncontrolled',
+    const form = useForm<BulkUpdateUsersRequest>({
+        mode: 'controlled',
         name: 'bulk-user-actions-form',
         initialValues: {
             uuids: [],
@@ -67,6 +76,7 @@ export const BulkUserActionsUpdateTabFeature = (props: IProps) => {
                 status: undefined,
                 trafficLimitBytes: undefined,
                 trafficLimitStrategy: undefined,
+                trafficResetDay: undefined,
                 expireAt: undefined,
                 description: undefined,
                 telegramId: undefined,
@@ -200,7 +210,23 @@ export const BulkUserActionsUpdateTabFeature = (props: IProps) => {
                     leftSection={<PiClockDuotone size="16px" />}
                     placeholder={t('create-user-modal.widget.pick-value')}
                     {...form.getInputProps('fields.trafficLimitStrategy')}
+                    onChange={(value) => {
+                        form.setFieldValue('fields.trafficLimitStrategy', value as never)
+                        form.setFieldValue(
+                            'fields.trafficResetDay',
+                            value === RESET_PERIODS.MONTH
+                                ? (form.values.fields.trafficResetDay ?? 1)
+                                : undefined
+                        )
+                    }}
                 />
+
+                {form.values.fields.trafficLimitStrategy === RESET_PERIODS.MONTH && (
+                    <TrafficResetDayPicker
+                        onChange={(day) => form.setFieldValue('fields.trafficResetDay', day)}
+                        value={form.values.fields.trafficResetDay}
+                    />
+                )}
 
                 <DateTimePicker
                     clearable

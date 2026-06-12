@@ -11,6 +11,7 @@ import { useIsLoadingRemnawaveUpdates, useRemnawaveInfo } from '@entities/dashbo
 import { ScrollToTopWrapper } from '@shared/hocs/scroll-to-top/scroll-to-top'
 import { SidebarTitleShared } from '@shared/ui/sidebar/sidebar-title'
 import { SidebarLogoShared } from '@shared/ui/sidebar/sidebar-logo'
+import { BuildVersionBadge } from '@shared/ui/build-version-badge'
 import { HeaderControls } from '@shared/ui/header-buttons'
 import { HelpDrawerShared } from '@shared/ui/help-drawer'
 
@@ -145,6 +146,7 @@ export function MainLayout() {
                 <ScrollToTopWrapper>
                     <Outlet />
                 </ScrollToTopWrapper>
+                <BuildVersionBadge />
                 <HelpDrawerShared />
             </AppShell.Main>
         </AppShell>

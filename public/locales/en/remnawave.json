@@ -1,5 +1,10 @@
 {
     "constants": {
+        "system-diagnostics": "System Diagnostics",
+        "system": "System",
+        "audit-logs": "Audit Logs",
+        "proxy-access-audit": "Access Audit",
+        "egress-rules": "Egress Rules",
         "dashboard": "Dashboard",
         "config": "Xray Config",
         "home": "Home",
@@ -526,6 +531,7 @@
     },
     "data-usage": {
         "column": {
+            "current-cycle": "Current",
             "monthly": "Monthly",
             "weekly": "Weekly",
             "daily": "Daily",
@@ -1025,7 +1031,32 @@
             "today": "Today",
             "tomorrow": "Tomorrow",
             "next-month": "Next Month",
-            "update-date": "Update Date"
+            "update-date": "Update Date",
+            "billing-amount": "Billing amount",
+            "billing-cycle": "Billing cycle",
+            "update-renewal": "Update Renewal"
+        }
+    },
+    "billing-cost": {
+        "cycle": {
+            "monthly": "Monthly",
+            "yearly": "Yearly"
+        },
+        "status": {
+            "normal": "Normal",
+            "due-soon": "Due soon",
+            "overdue": "Overdue",
+            "unconfigured": "Unconfigured"
+        }
+    },
+    "provider-renewal-costs": {
+        "widget": {
+            "service-provider-costs": "Service Provider Costs",
+            "provider": "Provider",
+            "monthly": "Month",
+            "yearly": "Year",
+            "nodes-count": "{{count}} nodes",
+            "no-costs-found": "No renewal costs found."
         }
     },
     "infra-providers-table": {
@@ -1069,8 +1100,12 @@
     "use-infra-billing-nodes-columns": {
         "hoster-name": "Hoster name",
         "node": "Node",
+        "cost": "Cost",
         "next-billing-at": "Next billing at",
-        "quick-update-to-next-month": "Quick update to next month"
+        "status": "Status",
+        "edit-renewal": "Edit renewal",
+        "quick-update-to-next-month": "Quick update to next month",
+        "quick-update-to-next-cycle": "Quick update to next cycle"
     },
     "next-billing-at-cell": {
         "in-current-month": "In current month",
@@ -1100,6 +1135,8 @@
                 "error": "Error",
                 "please-select-a-provider-and-billing-node": "Please select a provider and billing node",
                 "billing-node": "Billing Node",
+                "billing-amount": "Billing amount",
+                "billing-cycle": "Billing cycle",
                 "next-billing-at": "Next Billing At",
                 "next-billing-at-description": "The date and time for the next billing of this node. Remnawave will notify you about upcoming billing."
             }
@@ -1242,7 +1279,15 @@
             "payments-in": "Payments in {{month}}",
             "total-payments-made": "total payments made",
             "total-spent": "Total Spent",
-            "lifetime-spending": "lifetime spending"
+            "lifetime-spending": "lifetime spending",
+            "monthly-renewal-cost": "Monthly Cost",
+            "normalized-monthly-cost": "normalized recurring cost",
+            "yearly-renewal-cost": "Yearly Cost",
+            "normalized-yearly-cost": "normalized annual cost",
+            "due-soon": "Due Soon",
+            "within-seven-days": "within 7 days",
+            "overdue": "Overdue",
+            "needs-attention": "needs attention"
         }
     },
     "edit-node-by-uuid-modal": {
@@ -2121,7 +2166,11 @@
             "billing-nodes": "Billing nodes",
             "upcoming": "Upcoming",
             "per-month": "Per month",
-            "total-spent": "Total spent"
+            "total-spent": "Total spent",
+            "monthly-cost": "Monthly cost",
+            "yearly-cost": "Yearly cost",
+            "due-soon": "Due soon",
+            "overdue": "Overdue"
         }
     },
     "mobile-providers-list": {
@@ -2134,5 +2183,46 @@
             "history": "History",
             "providers": "Providers"
         }
+    },
+    "audit-logs": {
+        "description": "Review important administrator, API, and system operations",
+        "actor": "Actor",
+        "actor-type": "Actor type",
+        "action": "Action",
+        "resource": "Resource",
+        "resource-type": "Resource type",
+        "result": "Result",
+        "message": "Message",
+        "time": "Time",
+        "start-time": "Start time",
+        "end-time": "End time",
+        "apply": "Apply filters",
+        "clear": "Clear filters",
+        "details": "Audit details",
+        "empty": "No audit records",
+        "total": "{{count}} records"
+    },
+    "egress-rules": {
+        "title": "Egress Rules",
+        "description": "Configure egress security rules to block domain name, IP addresses, ports, or protocols.",
+        "new-rule": "New Rule",
+        "edit-rule": "Edit Rule",
+        "pattern": "Pattern",
+        "action": "Action",
+        "is-enabled": "Is Enabled",
+        "rule-name": "Rule Name",
+        "rule-description": "Rule Description",
+        "rule-pattern": "Pattern",
+        "rule-action": "Action",
+        "rule-is-enabled": "Is Enabled",
+        "rules": "Rules",
+        "empty": "No egress rules",
+        "test-rule": "Test Rule Matching",
+        "test-pattern": "Test Pattern/Domain/IP",
+        "test": "Test",
+        "test-result": "Test Result",
+        "matched": "Matched (Blocked)",
+        "not-matched": "Not Matched (Allowed)",
+        "reordered": "Reordered rules priority successfully"
     }
 }

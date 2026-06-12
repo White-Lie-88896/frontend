@@ -86,7 +86,8 @@ export const EditNodeByUuidModalContent = (props: IProps) => {
                 },
 
                 providerUuid: fetchedNode.providerUuid ?? undefined,
-                activePluginUuid: fetchedNode.activePluginUuid ?? undefined
+                activePluginUuid: fetchedNode.activePluginUuid ?? undefined,
+                proxyChainConfig: (fetchedNode.proxyChainConfig as Record<string, unknown> | null) ?? undefined
             })
         }
     }, [fetchedNode])
@@ -133,6 +134,7 @@ export const EditNodeByUuidModalContent = (props: IProps) => {
             nodePlugins={nodePlugins?.nodePlugins ?? []}
             nodeSystemCard={<NodeSystemCardWidget node={fetchedNode} />}
             pubKey={pubKey}
+            initialProxyChainConfig={fetchedNode.proxyChainConfig as Record<string, unknown> | null}
         />
     )
 }

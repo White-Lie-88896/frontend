@@ -23,6 +23,7 @@ import { ModalFooter } from '@shared/ui/modal-footer'
 import { NodeTrackingAndBillingCard } from './node-tracking-and-billing.card'
 import { NodeConfigProfilesCard } from './node-config-profiles.card'
 import { NodeConsumptionCard } from './node-consumption.card'
+import { NodeProxyChainCard } from './node-proxy-chain.card'
 import { NodeVitalsCard } from './node-vitals.card'
 
 const MotionWrapper = motion.div
@@ -56,6 +57,8 @@ interface IProps<T extends UpdateNodeCommand.Request> {
     nodePlugins: GetNodePluginsCommand.Response['response']['nodePlugins']
     nodeSystemCard?: ReactNode
     pubKey: GetPubKeyCommand.Response['response'] | undefined
+    /** 初始代理链配置 — 来自节点数据 */
+    initialProxyChainConfig?: Record<string, unknown> | null
 }
 
 export const BaseNodeForm = <T extends UpdateNodeCommand.Request>(props: IProps<T>) => {
@@ -68,7 +71,8 @@ export const BaseNodeForm = <T extends UpdateNodeCommand.Request>(props: IProps<
         nodeSystemCard,
         handleClose,
         handleSubmit,
-        isDataSubmitting
+        isDataSubmitting,
+        initialProxyChainConfig
     } = props
 
     const isMobile = useMediaQuery(`(max-width: ${em(768)})`)
@@ -115,6 +119,13 @@ export const BaseNodeForm = <T extends UpdateNodeCommand.Request>(props: IProps<
                     <NodeConsumptionCard
                         cardVariants={cardVariants}
                         form={form}
+                        motionWrapper={MotionWrapper}
+                    />
+
+                    <NodeProxyChainCard
+                        cardVariants={cardVariants}
+                        form={form}
+                        initialConfig={initialProxyChainConfig}
                         motionWrapper={MotionWrapper}
                     />
                 </MotionStack>
@@ -170,6 +181,13 @@ export const BaseNodeForm = <T extends UpdateNodeCommand.Request>(props: IProps<
                         <NodeTrackingAndBillingCard
                             cardVariants={cardVariants}
                             form={form}
+                            motionWrapper={MotionWrapper}
+                        />
+
+                        <NodeProxyChainCard
+                            cardVariants={cardVariants}
+                            form={form}
+                            initialConfig={initialProxyChainConfig}
                             motionWrapper={MotionWrapper}
                         />
                     </MotionStack>

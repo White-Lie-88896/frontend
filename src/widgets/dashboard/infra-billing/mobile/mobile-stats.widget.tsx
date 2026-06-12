@@ -1,40 +1,51 @@
 import { Card, Grid, Group, Stack, Text, ThemeIcon } from '@mantine/core'
-import { MdPayment, MdTrendingUp } from 'react-icons/md'
+import { MdTrendingUp } from 'react-icons/md'
 import { useTranslation } from 'react-i18next'
-import { TbCalendarUp } from 'react-icons/tb'
-import { FaServer } from 'react-icons/fa'
+import { TbCalendarDollar, TbCalendarExclamation, TbCalendarUp } from 'react-icons/tb'
 
 import { useGetInfraBillingNodes } from '@shared/api/hooks'
-import { formatCurrency } from '@shared/utils/misc'
+
+import { formatBillingCostBreakdown } from '../billing-cost.utils'
 
 export function MobileStatsWidget() {
     const { data: nodes } = useGetInfraBillingNodes()
     const { t } = useTranslation()
+    const renewalCosts = nodes?.stats.renewalCostsByCurrency ?? []
 
     const stats = [
         {
-            icon: FaServer,
-            color: 'blue',
-            value: nodes?.totalBillingNodes ?? 0,
-            label: t('mobile-stats.widget.billing-nodes')
-        },
-        {
-            icon: TbCalendarUp,
-            color: 'orange',
-            value: nodes?.stats.upcomingNodesCount ?? 0,
-            label: t('mobile-stats.widget.upcoming')
-        },
-        {
-            icon: MdPayment,
-            color: 'green',
-            value: formatCurrency(nodes?.stats.currentMonthPayments ?? 0),
-            label: t('mobile-stats.widget.per-month')
+            icon: TbCalendarDollar,
+            color: 'pink',
+            value: formatBillingCostBreakdown(
+                renewalCosts.map((cost) => ({
+                    amount: cost.monthlyRenewalCost,
+                    currency: cost.currency
+                }))
+            ),
+            label: t('mobile-stats.widget.monthly-cost')
         },
         {
             icon: MdTrendingUp,
             color: 'violet',
-            value: formatCurrency(nodes?.stats.totalSpent ?? 0),
-            label: t('mobile-stats.widget.total-spent')
+            value: formatBillingCostBreakdown(
+                renewalCosts.map((cost) => ({
+                    amount: cost.yearlyRenewalCost,
+                    currency: cost.currency
+                }))
+            ),
+            label: t('mobile-stats.widget.yearly-cost')
+        },
+        {
+            icon: TbCalendarUp,
+            color: 'orange',
+            value: nodes?.stats.dueSoonNodesCount ?? 0,
+            label: t('mobile-stats.widget.due-soon')
+        },
+        {
+            icon: TbCalendarExclamation,
+            color: 'red',
+            value: nodes?.stats.overdueNodesCount ?? 0,
+            label: t('mobile-stats.widget.overdue')
         }
     ]
 

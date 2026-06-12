@@ -1,5 +1,7 @@
-import { ActionIcon, CopyButton, Textarea } from '@mantine/core'
+import { ActionIcon, Textarea } from '@mantine/core'
 import { PiCheck, PiCopy } from 'react-icons/pi'
+
+import { RobustCopyButton } from '../robust-copy-button/robust-copy-button'
 
 export const CopyableAreaShared = ({
     label,
@@ -9,7 +11,7 @@ export const CopyableAreaShared = ({
     value: number | string
 }) => {
     return (
-        <CopyButton timeout={2000} value={value.toString()}>
+        <RobustCopyButton timeout={2000} value={value.toString()}>
             {({ copied, copy }) => (
                 <Textarea
                     label={label}
@@ -33,6 +35,6 @@ export const CopyableAreaShared = ({
                     value={value.toString()}
                 />
             )}
-        </CopyButton>
+        </RobustCopyButton>
     )
 }

@@ -1,5 +1,6 @@
 import {
     GetBandwidthStatsCommand,
+    GetDiagnosticsCommand,
     GetMetadataCommand,
     GetNodesMetricsCommand,
     GetNodesStatisticsCommand,
@@ -22,6 +23,9 @@ export const systemQueryKeys = createQueryKeys('system', {
         queryKey: null
     },
     getBandwidthStats: {
+        queryKey: null
+    },
+    getDiagnostics: {
         queryKey: null
     },
     getNodesStatistics: {
@@ -71,6 +75,17 @@ export const useGetBandwidthStats = createGetQueryHook({
         tz: getUserTimezoneUtil()
     },
     errorHandler: (error) => errorHandler(error, 'Get Bandwidth Stats')
+})
+
+export const useGetDiagnostics = createGetQueryHook({
+    endpoint: GetDiagnosticsCommand.TSQ_url,
+    responseSchema: GetDiagnosticsCommand.ResponseSchema,
+    getQueryKey: () => systemQueryKeys.getDiagnostics.queryKey,
+    rQueryParams: {
+        placeholderData: keepPreviousData,
+        staleTime: sToMs(30)
+    },
+    errorHandler: (error) => errorHandler(error, 'Get System Diagnostics')
 })
 
 export const useGetNodesStatisticsCommand = createGetQueryHook({

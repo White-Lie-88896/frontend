@@ -1,7 +1,8 @@
-import { ActionIcon, Box, CopyButton, Input, InputWrapperProps, MantineColor } from '@mantine/core'
+import { ActionIcon, Box, Input, InputWrapperProps, MantineColor } from '@mantine/core'
 import { PiCheck, PiCopy } from 'react-icons/pi'
 import clsx from 'clsx'
 
+import { RobustCopyButton } from '../robust-copy-button/robust-copy-button'
 import styles from './copyable-code-block.module.css'
 
 interface IProps {
@@ -17,7 +18,7 @@ export function CopyableCodeBlock({ color, value, size = 'normal', inputWrapperP
 
     return (
         <Input.Wrapper {...inputWrapperProps}>
-            <CopyButton timeout={2000} value={value.toString()}>
+            <RobustCopyButton timeout={2000} value={value.toString()}>
                 {({ copied, copy }) => (
                     <Box
                         className={clsx(styles.container, {
@@ -28,7 +29,7 @@ export function CopyableCodeBlock({ color, value, size = 'normal', inputWrapperP
                         <Box className={styles.codeWrapper}>
                             <Box c={color} className={styles.code}>
                                 {value}
-                            </Box>
+                             </Box>
                         </Box>
                         <ActionIcon
                             className={styles.copyButton}
@@ -40,7 +41,7 @@ export function CopyableCodeBlock({ color, value, size = 'normal', inputWrapperP
                         </ActionIcon>
                     </Box>
                 )}
-            </CopyButton>
+            </RobustCopyButton>
         </Input.Wrapper>
     )
 }

@@ -1,5 +1,8 @@
 export * from './api-tokens/api-tokens.mutation.hooks'
 export * from './api-tokens/api-tokens.query.hooks'
+export * from './audit-logs/audit-logs.query.hooks'
+export * from './egress-rules/egress-rules.mutation.hooks'
+export * from './egress-rules/egress-rules.query.hooks'
 
 export * from './auth/auth.hooks'
 export * from './auth/auth.query.hooks'
@@ -37,6 +40,8 @@ export * from './nodes/nodes.query.hooks'
 export * from './passkeys/passkeys.hooks'
 
 export * from './passkeys/passkeys.query.hooks'
+export * from './proxy-access-audit/proxy-access-audit.mutation.hooks'
+export * from './proxy-access-audit/proxy-access-audit.query.hooks'
 export * from './remnawave-settings/remnawave-settings.mutation.hooks'
 
 export * from './remnawave-settings/remnawave-settings.query.hooks'

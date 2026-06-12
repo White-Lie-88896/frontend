@@ -36,6 +36,12 @@
     /* ------------------------------------------------------------ */
     "baseUrl": ".",
     "paths": {
+      "@remnawave/backend-contract": [
+        "../remnawave-backend/libs/contract"
+      ],
+      "@remnawave/backend-contract/*": [
+        "../remnawave-backend/libs/contract/*"
+      ],
       "@entities/*": [
         "./src/entities/*"
       ],

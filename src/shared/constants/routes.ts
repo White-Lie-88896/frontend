@@ -48,6 +48,14 @@ export const ROUTES = {
         CRM: {
             ROOT: '/dashboard/crm',
             INFRA_BILLING: '/dashboard/crm/infra-billing'
+        },
+        SYSTEM: {
+            ROOT: '/dashboard/system',
+            DIAGNOSTICS: '/dashboard/system/diagnostics',
+            AUDIT_LOGS: '/dashboard/system/audit-logs',
+            PROXY_ACCESS_AUDIT: '/dashboard/system/proxy-access-audit',
+            EGRESS_RULES: '/dashboard/system/egress-rules',
+            PROXY_LIBRARY: '/dashboard/system/proxy-library'
         }
     }
 } as const

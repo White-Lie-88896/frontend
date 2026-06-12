@@ -5,14 +5,14 @@ import { useTranslation } from 'react-i18next'
 import { TbServer } from 'react-icons/tb'
 import { useForm } from '@mantine/form'
 
-import { MODALS, useModalClose, useModalIsOpen } from '@entities/dashboard/modal-store'
+import { MODALS, useModalClose, useModalState } from '@entities/dashboard/modal-store'
 import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
 import { QueryKeys, useCreateInfraProvider } from '@shared/api/hooks'
 import { handleFormErrors } from '@shared/utils/misc'
 import { queryClient } from '@shared/api'
 
 export function CreateInfraProviderDrawerWidget() {
-    const isOpen = useModalIsOpen(MODALS.CREATE_INFRA_PROVIDER_DRAWER)
+    const { isOpen, internalState } = useModalState(MODALS.CREATE_INFRA_PROVIDER_DRAWER)
     const close = useModalClose(MODALS.CREATE_INFRA_PROVIDER_DRAWER)
 
     const { t } = useTranslation()
@@ -26,11 +26,12 @@ export function CreateInfraProviderDrawerWidget() {
     const { mutate: createInfraProvider, isPending: isCreateInfraProviderPending } =
         useCreateInfraProvider({
             mutationFns: {
-                onSuccess: () => {
+                onSuccess: (provider) => {
                     queryClient.refetchQueries({
                         queryKey: QueryKeys.infraBilling.getInfraProviders.queryKey
                     })
 
+                    internalState?.onCreated?.(provider)
                     close()
                 },
                 onError: (error) => {

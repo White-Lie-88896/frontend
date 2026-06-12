@@ -51,6 +51,16 @@ const updateUserResponseSchema = UpdateUserCommand.ResponseSchema.extend({
     })
 })
 
+const bulkUpdateUsersRequestSchema = BulkUpdateUsersCommand.RequestSchema.extend({
+    fields: BulkUpdateUsersCommand.RequestSchema.shape.fields.extend({
+        trafficResetDay: trafficResetDaySchema.optional()
+    })
+})
+
+const bulkAllUpdateUsersRequestSchema = BulkAllUpdateUsersCommand.RequestSchema.extend({
+    trafficResetDay: trafficResetDaySchema.optional()
+})
+
 export const useCreateUser = createMutationHook({
     endpoint: CreateUserCommand.TSQ_url,
     bodySchema: createUserRequestSchema,
@@ -230,7 +240,7 @@ export const useBulkDeleteUsersByStatus = createMutationHook({
 
 export const useBulkUpdateUsers = createMutationHook({
     endpoint: BulkUpdateUsersCommand.TSQ_url,
-    bodySchema: BulkUpdateUsersCommand.RequestSchema,
+    bodySchema: bulkUpdateUsersRequestSchema,
     responseSchema: BulkUpdateUsersCommand.ResponseSchema,
     requestMethod: BulkUpdateUsersCommand.endpointDetails.REQUEST_METHOD,
     rMutationParams: {
@@ -350,7 +360,7 @@ export const useBulkSetActiveInternalSquads = createMutationHook({
 
 export const useBulkAllUpdateUsers = createMutationHook({
     endpoint: BulkAllUpdateUsersCommand.TSQ_url,
-    bodySchema: BulkAllUpdateUsersCommand.RequestSchema,
+    bodySchema: bulkAllUpdateUsersRequestSchema,
     responseSchema: BulkAllUpdateUsersCommand.ResponseSchema,
     requestMethod: BulkAllUpdateUsersCommand.endpointDetails.REQUEST_METHOD,
     rMutationParams: {

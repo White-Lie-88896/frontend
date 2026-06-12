@@ -2,26 +2,36 @@ import {
     ActionIcon,
     ActionIconGroup,
     Avatar,
+    Badge,
     Center,
     Flex,
     Group,
+    Stack,
     Text,
     Tooltip
 } from '@mantine/core'
 import { GetInfraBillingNodesCommand } from '@remnawave/backend-contract'
 import { HiCalendar, HiOfficeBuilding, HiServer } from 'react-icons/hi'
-import { TbCheckbox, TbClick, TbExternalLink } from 'react-icons/tb'
+import { TbCheckbox, TbClick, TbCurrencyDollar, TbExternalLink, TbPencil } from 'react-icons/tb'
 import { DataTableColumn } from 'mantine-datatable'
 import ReactCountryFlag from 'react-country-flag'
 import { TFunction } from 'i18next'
 
 import { faviconResolver } from '@shared/utils/misc'
 
+import {
+    formatBillingCurrency,
+    getBillingCycleLabel,
+    getRenewalStatus
+} from '../billing-cost.utils'
 import { InfraBillingNodesTableNextBillingAtCell } from './next-billing-at-cell'
 import { InfraProvidersColumnTitle } from './column-title'
 
 export function getInfraBillingNodesColumns(
     handleQuickUpdateNextBillingAt: (uuid: string, currentDate: Date) => void,
+    handleOpenEditBillingNode: (
+        node: GetInfraBillingNodesCommand.Response['response']['billingNodes'][number]
+    ) => void,
     isQuickUpdatePending: (uuid: string) => boolean,
     t: TFunction
 ): DataTableColumn<
@@ -29,6 +39,33 @@ export function getInfraBillingNodesColumns(
     GetInfraBillingNodesCommand.Response['response']['billingNodes'][number]
 >[] {
     return [
+        {
+            accessor: 'node',
+            ellipsis: true,
+            title: (
+                <InfraProvidersColumnTitle
+                    icon={HiServer}
+                    title={t('use-infra-billing-nodes-columns.node')}
+                />
+            ),
+            width: 280,
+            render: ({ node }) => (
+                <Flex align="center" gap="xs">
+                    {node.countryCode && node.countryCode !== 'XX' && (
+                        <ReactCountryFlag
+                            countryCode={node.countryCode}
+                            style={{
+                                fontSize: '1.5em',
+                                borderRadius: '2px'
+                            }}
+                        />
+                    )}
+                    <Text fw={600} size="sm">
+                        {node.name}
+                    </Text>
+                </Flex>
+            )
+        },
         {
             accessor: 'provider.name',
             ellipsis: true,
@@ -38,7 +75,7 @@ export function getInfraBillingNodesColumns(
                     title={t('use-infra-billing-nodes-columns.hoster-name')}
                 />
             ),
-            width: 200,
+            width: 190,
             render: ({ provider }) => (
                 <Flex
                     align="center"
@@ -80,34 +117,30 @@ export function getInfraBillingNodesColumns(
             )
         },
         {
-            accessor: 'node',
+            accessor: 'billingAmount',
             ellipsis: true,
             title: (
                 <InfraProvidersColumnTitle
-                    icon={HiServer}
-                    title={t('use-infra-billing-nodes-columns.node')}
+                    icon={TbCurrencyDollar}
+                    justify="flex-end"
+                    title={t('use-infra-billing-nodes-columns.cost')}
                 />
             ),
-            width: 150,
-            textAlign: 'center',
-            render: ({ node }) => (
-                <Flex align="center" gap="xs">
-                    {node.countryCode && node.countryCode !== 'XX' && (
-                        <ReactCountryFlag
-                            countryCode={node.countryCode}
-                            style={{
-                                fontSize: '1.5em',
-                                borderRadius: '2px'
-                            }}
-                        />
-                    )}
-                    <Text fw={600} size="sm">
-                        {node.name}
+            width: 130,
+            textAlign: 'right',
+            render: ({ billingAmount, billingCurrency, billingCycle }) => (
+                <Stack align="flex-end" gap={0}>
+                    <Text fw={700} size="sm">
+                        {billingAmount > 0
+                            ? formatBillingCurrency(billingAmount, billingCurrency)
+                            : '-'}
                     </Text>
-                </Flex>
+                    <Text c="dimmed" size="xs">
+                        {getBillingCycleLabel(billingCycle, t)}
+                    </Text>
+                </Stack>
             )
         },
-
         {
             accessor: 'nextBillingAt',
             ellipsis: true,
@@ -124,20 +157,47 @@ export function getInfraBillingNodesColumns(
             )
         },
         {
+            accessor: 'renewalStatus',
+            ellipsis: true,
+            title: t('use-infra-billing-nodes-columns.status'),
+            width: 120,
+            textAlign: 'center',
+            render: ({ billingAmount, nextBillingAt }) => {
+                const status = getRenewalStatus({ billingAmount, nextBillingAt, t })
+
+                return (
+                    <Badge color={status.color} radius="sm" variant="soft">
+                        {status.label}
+                    </Badge>
+                )
+            }
+        },
+        {
             accessor: 'actions',
             title: (
                 <Center>
                     <TbClick size={16} />
                 </Center>
             ),
-            width: 50,
+            width: 88,
             resizable: false,
             textAlign: 'center',
             render: (row) => (
                 <Group justify="center" wrap="nowrap">
                     <ActionIconGroup>
+                        <Tooltip label={t('use-infra-billing-nodes-columns.edit-renewal')} withArrow>
+                            <ActionIcon
+                                color="blue"
+                                onClick={() => handleOpenEditBillingNode(row)}
+                                size="md"
+                                variant="outline"
+                            >
+                                <TbPencil size={16} />
+                            </ActionIcon>
+                        </Tooltip>
+
                         <Tooltip
-                            label={t('use-infra-billing-nodes-columns.quick-update-to-next-month')}
+                            label={t('use-infra-billing-nodes-columns.quick-update-to-next-cycle')}
                             withArrow
                         >
                             <ActionIcon

@@ -4,6 +4,8 @@ import removeConsole from 'vite-plugin-remove-console'
 import webfontDownload from 'vite-plugin-webfont-dl'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { ViteEjsPlugin } from 'vite-plugin-ejs'
+import { execSync } from 'node:child_process'
+import { readFileSync } from 'node:fs'
 import { fileURLToPath, URL } from 'node:url'
 import react from '@vitejs/plugin-react-swc'
 // import deadFile from 'vite-plugin-deadfile'
@@ -11,6 +13,33 @@ import { defineConfig } from 'vite'
 import * as dotenv from 'dotenv'
 
 dotenv.config({ path: `${__dirname}/.env` })
+
+const packageJson = JSON.parse(
+    readFileSync(new URL('./package.json', import.meta.url), 'utf8')
+) as { version?: string }
+
+const getBuildHash = () => {
+    try {
+        const commit = execSync('git rev-parse --short=8 HEAD', {
+            stdio: ['ignore', 'pipe', 'ignore']
+        })
+            .toString()
+            .trim()
+        const status = execSync('git status --porcelain', {
+            stdio: ['ignore', 'pipe', 'ignore']
+        })
+            .toString()
+            .trim()
+
+        return status ? `${commit}-dirty` : commit
+    } catch {
+        return 'local'
+    }
+}
+
+const APP_VERSION = packageJson.version ?? '0.0.0'
+const BUILD_HASH = process.env.BUILD_HASH || getBuildHash()
+const BUILD_TIME = process.env.BUILD_TIME || new Date().toISOString()
 
 export default defineConfig({
     assetsInclude: ['**/*.lottie'],
@@ -105,7 +134,12 @@ export default defineConfig({
         }
     },
     define: {
-        __DOMAIN_BACKEND__: JSON.stringify(process.env.DOMAIN_BACKEND || 'example.com').trim(),
+        __DOMAIN_BACKEND__: JSON.stringify(
+            process.env.DOMAIN_BACKEND || 'http://127.0.0.1:3003'
+        ).trim(),
+        __APP_VERSION__: JSON.stringify(APP_VERSION).trim(),
+        __BUILD_HASH__: JSON.stringify(BUILD_HASH).trim(),
+        __BUILD_TIME__: JSON.stringify(BUILD_TIME).trim(),
         __NODE_ENV__: JSON.stringify(process.env.NODE_ENV).trim(),
         __DOMAIN_OVERRIDE__: JSON.stringify(process.env.DOMAIN_OVERRIDE || '0').trim()
     },
@@ -121,6 +155,7 @@ export default defineConfig({
     },
     resolve: {
         alias: {
+            '@remnawave/backend-contract': fileURLToPath(new URL('../remnawave-backend/libs/contract', import.meta.url)),
             '@entities': fileURLToPath(new URL('./src/entities', import.meta.url)),
             '@features': fileURLToPath(new URL('./src/features', import.meta.url)),
             '@pages': fileURLToPath(new URL('./src/pages', import.meta.url)),
